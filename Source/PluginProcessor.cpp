@@ -10,7 +10,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-Test_AudioPluginAudioProcessor::Test_AudioPluginAudioProcessor()
+Audio_PluginAudioProcessor::Audio_PluginAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -24,17 +24,17 @@ Test_AudioPluginAudioProcessor::Test_AudioPluginAudioProcessor()
 {
 }
 
-Test_AudioPluginAudioProcessor::~Test_AudioPluginAudioProcessor()
+Audio_PluginAudioProcessor::~Audio_PluginAudioProcessor()
 {
 }
 
 //==============================================================================
-const juce::String Test_AudioPluginAudioProcessor::getName() const
+const juce::String Audio_PluginAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool Test_AudioPluginAudioProcessor::acceptsMidi() const
+bool Audio_PluginAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -43,7 +43,7 @@ bool Test_AudioPluginAudioProcessor::acceptsMidi() const
    #endif
 }
 
-bool Test_AudioPluginAudioProcessor::producesMidi() const
+bool Audio_PluginAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -52,7 +52,7 @@ bool Test_AudioPluginAudioProcessor::producesMidi() const
    #endif
 }
 
-bool Test_AudioPluginAudioProcessor::isMidiEffect() const
+bool Audio_PluginAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -61,50 +61,50 @@ bool Test_AudioPluginAudioProcessor::isMidiEffect() const
    #endif
 }
 
-double Test_AudioPluginAudioProcessor::getTailLengthSeconds() const
+double Audio_PluginAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int Test_AudioPluginAudioProcessor::getNumPrograms()
+int Audio_PluginAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int Test_AudioPluginAudioProcessor::getCurrentProgram()
+int Audio_PluginAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void Test_AudioPluginAudioProcessor::setCurrentProgram (int index)
+void Audio_PluginAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const juce::String Test_AudioPluginAudioProcessor::getProgramName (int index)
+const juce::String Audio_PluginAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void Test_AudioPluginAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void Audio_PluginAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
 
 //==============================================================================
-void Test_AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void Audio_PluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 }
 
-void Test_AudioPluginAudioProcessor::releaseResources()
+void Audio_PluginAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool Test_AudioPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool Audio_PluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
@@ -129,7 +129,7 @@ bool Test_AudioPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 }
 #endif
 
-void Test_AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void Audio_PluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
@@ -159,33 +159,79 @@ void Test_AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
 }
 
 //==============================================================================
-bool Test_AudioPluginAudioProcessor::hasEditor() const
+bool Audio_PluginAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* Test_AudioPluginAudioProcessor::createEditor()
+juce::AudioProcessorEditor* Audio_PluginAudioProcessor::createEditor()
 {
-    return new Test_AudioPluginAudioProcessorEditor (*this);
+    //return new Audio_PluginAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
-void Test_AudioPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void Audio_PluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void Test_AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void Audio_PluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout Audio_PluginAudioProcessor::createParameterLayout()
+{
+	juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+	layout.add(std::make_unique< juce::AudioParameterFloat>("LowCut Freq",
+															"LowCut Freq",
+															 juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f),
+															 20.0f));
+
+	layout.add(std::make_unique< juce::AudioParameterFloat>("HighCut Freq",
+															"HighCut Freq",
+															juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f),
+															20000.0f));
+
+	layout.add(std::make_unique< juce::AudioParameterFloat>("Peak Freq",
+															"Peak Freq",
+															juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f),
+															750.0f));
+
+	layout.add(std::make_unique< juce::AudioParameterFloat>("Peak Gain",
+															"Peak Gain",
+															juce::NormalisableRange<float>(-24.0f, 24.0f, 0.5f, 1.0f),
+															0.0f));
+
+	layout.add(std::make_unique< juce::AudioParameterFloat>("Peak Quality",
+															"Peak Quality",
+															juce::NormalisableRange<float>(0.1f, 10.0f, 0.05f, 1.0f),
+															1.0f));
+
+	juce::StringArray stringArray;
+	for (int i = 0; i < 4; ++i)
+	{
+		juce::String str;
+		str << (12 + i * 12);
+		str << "dD/Oct";
+		stringArray.add(str);
+	}
+
+	layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", stringArray, 0));
+	layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
+
+
+	return layout;
 }
 
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new Test_AudioPluginAudioProcessor();
+    return new Audio_PluginAudioProcessor();
 }

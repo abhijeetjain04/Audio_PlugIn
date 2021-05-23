@@ -13,12 +13,12 @@
 //==============================================================================
 /**
 */
-class Test_AudioPluginAudioProcessor  : public juce::AudioProcessor
+class Audio_PluginAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
-    Test_AudioPluginAudioProcessor();
-    ~Test_AudioPluginAudioProcessor() override;
+    Audio_PluginAudioProcessor();
+    ~Audio_PluginAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -53,7 +53,11 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+	static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+	juce::AudioProcessorValueTreeState apvts{ *this,nullptr,"Parameters", createParameterLayout()};
+
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Test_AudioPluginAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Audio_PluginAudioProcessor)
 };
