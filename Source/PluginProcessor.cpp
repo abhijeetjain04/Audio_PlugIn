@@ -107,10 +107,11 @@ void AudioPlugin_TestAudioProcessor::prepareToPlay (double sampleRate, int sampl
 
 	updateFilters();//Update all the filters
 
-
+	//Preparing the channel Fifo
 	leftChannelFifo.prepare(samplesPerBlock);
 	rightChannelFifo.prepare(samplesPerBlock);
 
+	//Create sin wave
 	osc.initialise([](float x) { return std::sin(x); });
 
 	spec.numChannels = getTotalNumOutputChannels();
@@ -165,7 +166,7 @@ void AudioPlugin_TestAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
 	for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
 		buffer.clear(i, 0, buffer.getNumSamples());
 
-	updateFilters();//Updatre all the filters
+	updateFilters();//Update all the filters
 
 	// This is the place where you'd normally do the guts of your plugin's
 	// audio processing...
@@ -190,9 +191,9 @@ void AudioPlugin_TestAudioProcessor::processBlock (juce::AudioBuffer<float>& buf
 	leftChain.process(leftContext);
 	rightChain.process(rightContext);
 
+	//Push buffer into Fifo
 	leftChannelFifo.update(buffer);
 	rightChannelFifo.update(buffer);
-
 }
 
 //==============================================================================
@@ -242,6 +243,7 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
 	settings.lowCutSlope = static_cast<Slope>(apvts.getRawParameterValue("LowCut Slope")->load());
 	settings.highCutSlope = static_cast<Slope>(apvts.getRawParameterValue("HighCut Slope")->load());
 
+	//Bypass are bool but store as float if the value is greater then 0.5 then its true 
 	settings.lowCutBypassed = apvts.getRawParameterValue("LowCut Bypassed")->load() > 0.5f;
 	settings.peakBypassed = apvts.getRawParameterValue("Peak Bypassed")->load() > 0.5f;
 	settings.highCutBypassed = apvts.getRawParameterValue("HighCut Bypassed")->load() > 0.5f;
@@ -355,6 +357,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AudioPlugin_TestAudioProcess
 	layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", stringArray, 0));
 	layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
 
+	//Bypass buttons
 	layout.add(std::make_unique<juce::AudioParameterBool>("LowCut Bypassed", "LowCut Bypassed", false));
 	layout.add(std::make_unique<juce::AudioParameterBool>("Peak Bypassed", "Peak Bypassed", false));
 	layout.add(std::make_unique<juce::AudioParameterBool>("HighCut Bypassed", "HighCut Bypassed", false));

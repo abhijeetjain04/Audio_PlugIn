@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include <array>
 
+//Explained in another tutorial 
 template<typename T>
 struct Fifo
 {
@@ -40,6 +41,7 @@ struct Fifo
 		}
 	}
 
+	//Push stuff 
 	bool push(const T& t)
 	{
 		auto write = fifo.write(1);
@@ -52,6 +54,7 @@ struct Fifo
 		return false;
 	}
 
+	//Pull stuff
 	bool pull(T& t)
 	{
 		auto read = fifo.read(1);
@@ -80,6 +83,7 @@ enum Channel
 	Left //effectively 1
 };
 
+//Explained in another tutorial 
 template<typename BlockType>
 struct SingleChannelSampleFifo
 {
@@ -88,6 +92,7 @@ struct SingleChannelSampleFifo
 		prepared.set(false);
 	}
 
+	//How do we feed buffer
 	void update(const BlockType& buffer)
 	{
 		jassert(prepared.get());
@@ -100,6 +105,7 @@ struct SingleChannelSampleFifo
 		}
 	}
 
+	//How to prepare buffer
 	void prepare(int bufferSize)
 	{
 		prepared.set(false);
@@ -114,11 +120,15 @@ struct SingleChannelSampleFifo
 		fifoIndex = 0;
 		prepared.set(true);
 	}
+
 	//==============================================================================
 	int getNumCompleteBuffersAvailable() const { return audioBufferFifo.getNumAvailableForReading(); }
 	bool isPrepared() const { return prepared.get(); }
+	//How many buffers we have 
 	int getSize() const { return size.get(); }
+
 	//==============================================================================
+	//get buffers from it
 	bool getAudioBuffer(BlockType& buf) { return audioBufferFifo.pull(buf); }
 private:
 	Channel channelToUse;
@@ -159,6 +169,7 @@ struct ChainSettings
 
 	Slope lowCutSlope{ Slope::Slope_12 }, highCutSlope{ Slope::Slope_12 };
 
+	//Bypass flags
 	bool lowCutBypassed{ false }, peakBypassed{ false }, highCutBypassed{ false };
 };
 
@@ -193,7 +204,6 @@ void update(ChainType& chain, const CoefficientType& coefficient)
 template<typename ChainType, typename CoefficientType>// As we dont know the type of variable hence we are using template function
 void updateCutFilter(ChainType& chain, const CoefficientType& coefficients, const Slope& slope)
 {
-
     chain.template setBypassed<0>(true);
     chain.template setBypassed<1>(true);
     chain.template setBypassed<2>(true);
@@ -277,6 +287,7 @@ private:
 
     void updateFilters();//Update all the filters
 
+	//Produce a sin wave and then aling with a particular freq
 	juce::dsp::Oscillator<float> osc;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPlugin_TestAudioProcessor)

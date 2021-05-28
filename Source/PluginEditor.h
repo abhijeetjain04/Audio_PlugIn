@@ -24,6 +24,7 @@ struct FFTDataGenerator
     /**
      produces the FFT data from an audio buffer.
      */
+    //Feed audio into FFT
     void produceFFTDataForRendering(const juce::AudioBuffer<float>& audioData, const float negativeInfinity)
     {
         const auto fftSize = getFFTSize();
@@ -84,9 +85,14 @@ struct FFTDataGenerator
     }
     //==============================================================================
     int getFFTSize() const { return 1 << order; }
+
+    //How much FFT data is available 
     int getNumAvailableFFTDataBlocks() const { return fftDataFifo.getNumAvailableForReading(); }
+
     //==============================================================================
+    //Get FFT data
     bool getFFTData(BlockType& fftData) { return fftDataFifo.pull(fftData); }
+
 private:
     FFTOrder order;
     BlockType fftData;
@@ -167,24 +173,15 @@ private:
 
 struct LookAndFeel : juce::LookAndFeel_V4
 {
-    void drawRotarySlider(juce::Graphics&,
-        int x, int y, int width, int height,
-        float sliderPosProportional,
-        float rotaryStartAngle,
-        float rotaryEndAngle,
-        juce::Slider&) override;
+    void drawRotarySlider(juce::Graphics&,int x, int y, int width, int height,float sliderPosProportional,float rotaryStartAngle,float rotaryEndAngle,juce::Slider&) override;
 
-    void drawToggleButton(juce::Graphics& g,
-        juce::ToggleButton& toggleButton,
-        bool shouldDrawButtonAsHighlighted,
-        bool shouldDrawButtonAsDown) override;
+    void drawToggleButton(juce::Graphics& g,juce::ToggleButton& toggleButton,bool shouldDrawButtonAsHighlighted,bool shouldDrawButtonAsDown) override;
 };
 
 struct RotarySliderWithLabels : juce::Slider
 {
     RotarySliderWithLabels(juce::RangedAudioParameter& rap, const juce::String& unitSuffix) :
-        juce::Slider(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag,
-            juce::Slider::TextEntryBoxPosition::NoTextBox),
+        juce::Slider(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag,juce::Slider::TextEntryBoxPosition::NoTextBox),
         param(&rap),
         suffix(unitSuffix)
     {
@@ -196,6 +193,7 @@ struct RotarySliderWithLabels : juce::Slider
         setLookAndFeel(nullptr);
     }
 
+    //Center label text
     struct LabelPos
     {
         float pos;
@@ -204,13 +202,15 @@ struct RotarySliderWithLabels : juce::Slider
 
     juce::Array<LabelPos> labels;
 
-    void paint(juce::Graphics& g) override;
+    void paint(juce::Graphics& graphics) override;
     juce::Rectangle<int> getSliderBounds() const;
     int getTextHeight() const { return 14; }
     juce::String getDisplayString() const;
 private:
+    //LooknFeel instance 
     LookAndFeel lnf;
 
+    //Base class of AudioParamterbool, AudioParamterChoice , AudioParamterFloat , AudioParamterInt
     juce::RangedAudioParameter* param;
     juce::String suffix;
 };
@@ -223,13 +223,17 @@ struct PathProducer
         leftChannelFFTDataGenerator.changeOrder(FFTOrder::order2048);
         monoBuffer.setSize(1, leftChannelFFTDataGenerator.getFFTSize());
     }
+
     void process(juce::Rectangle<float> fftBounds, double sampleRate);
     juce::Path getPath() { return leftChannelFFTPath; }
+
 private:
     SingleChannelSampleFifo<AudioPlugin_TestAudioProcessor::BlockType>* leftChannelFifo;
 
+    //Fill with blocks of audio from left to right (First come first out)
     juce::AudioBuffer<float> monoBuffer;
 
+    //FFT data generator
     FFTDataGenerator<std::vector<float>> leftChannelFFTDataGenerator;
 
     AnalyzerPathGenerator<juce::Path> pathProducer;
@@ -237,9 +241,8 @@ private:
     juce::Path leftChannelFFTPath;
 };
 
-struct ResponseCurveComponent : juce::Component,
-    juce::AudioProcessorParameter::Listener,
-    juce::Timer
+// As responseCurve is the component of editor now we will not draw out of our bounds
+struct ResponseCurveComponent : juce::Component,juce::AudioProcessorParameter::Listener,juce::Timer
 {
     ResponseCurveComponent(AudioPlugin_TestAudioProcessor&);
     ~ResponseCurveComponent();
@@ -254,10 +257,7 @@ struct ResponseCurveComponent : juce::Component,
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void toggleAnalysisEnablement(bool enabled)
-    {
-        shouldShowFFTAnalysis = enabled;
-    }
+    void toggleAnalysisEnablement(bool enabled){shouldShowFFTAnalysis = enabled;}
 private:
     AudioPlugin_TestAudioProcessor& audioProcessor;
 
@@ -314,7 +314,6 @@ struct AnalyzerButton : juce::ToggleButton
     juce::Path randomPath;
 };
 
-
 //==============================================================================
 /**
 */
@@ -333,15 +332,9 @@ private:
 	// access the processor object that created it.
     AudioPlugin_TestAudioProcessor& audioProcessor;
 
+	RotarySliderWithLabels peakFreqSlider,peakGainSlider,peakQualitySlider,lowCutFreqSlider,highCutFreqSlider,lowCutSlopeSlider,highCutSlopeSlider;
 
-	RotarySliderWithLabels peakFreqSlider,
-		peakGainSlider,
-		peakQualitySlider,
-		lowCutFreqSlider,
-		highCutFreqSlider,
-		lowCutSlopeSlider,
-		highCutSlopeSlider;
-
+    //ResponseCurve instance
 	ResponseCurveComponent responseCurveComponent;
 
 	using APVTS = juce::AudioProcessorValueTreeState;
@@ -360,15 +353,17 @@ private:
 	PowerButton lowcutBypassButton, peakBypassButton, highcutBypassButton;
 	AnalyzerButton analyzerEnabledButton;
 
+    //bypass button attachments 
 	using ButtonAttachment = APVTS::ButtonAttachment;
+	ButtonAttachment lowcutBypassButtonAttachment,peakBypassButtonAttachment,highcutBypassButtonAttachment,analyzerEnabledButtonAttachment;
 
-	ButtonAttachment lowcutBypassButtonAttachment,
-		peakBypassButtonAttachment,
-		highcutBypassButtonAttachment,
-		analyzerEnabledButtonAttachment;
-
+    //customize look n feel component
 	LookAndFeel lnf;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPlugin_TestAudioProcessorEditor)
 
 };
+
+//The low cut slider removes low frequencies from the audio.You'll interpret this as the bass disappearing from the sound.
+//the High cut slider removes high frequencies.This will sound like the audio is getting more and more muffled.
+//You'll need to play with the peak slider and gain slider to hear the effects of that filter.
