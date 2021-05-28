@@ -1,5 +1,5 @@
 # Audio_PlugIn
-Simple audio plugin build using open source tutorial.  
+Simple audio plugin build using JUCE audio framework(open source tutorial).  
 
 ![PlugIn](https://user-images.githubusercontent.com/25602737/119811766-16037880-bf05-11eb-9dab-1fd29c948d85.png)
 
