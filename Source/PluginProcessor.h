@@ -292,3 +292,7 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPlugin_TestAudioProcessor)
 };
+
+//The low cut slider removes low frequencies from the audio.You'll interpret this as the bass disappearing from the sound.
+//the High cut slider removes high frequencies.This will sound like the audio is getting more and more muffled.
+//You'll need to play with the peak slider and gain slider to hear the effects of that filter.

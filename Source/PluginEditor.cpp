@@ -81,28 +81,32 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
 
 		auto bounds = toggleButton.getLocalBounds();
 
-		auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 6;
+		//bounding box around the power button
+		//g.setColour(Colours::red);
+		//g.drawRect(bounds);
+
+		auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 6;//JUCE_LIVE_CONSTANT(6)
 		auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
 
-		float ang = 30.f; //30.f;
+		float ang = 30.f; //JUCE_LIVE_CONSTANT(30);
 
-		size -= 6;
+		size -= 6; //JUCE_LIVE_CONSTANT(6);
 
 		powerButton.addCentredArc(r.getCentreX(),
-			r.getCentreY(),
-			size * 0.5,
-			size * 0.5,
-			0.f,
-			degreesToRadians(ang),
-			degreesToRadians(360.f - ang),
-			true);
+								  r.getCentreY(),
+								  size * 0.5,
+								  size * 0.5,
+								  0.f,
+								  degreesToRadians(ang),
+								  degreesToRadians(360.f - ang),
+								  true);
 
 		powerButton.startNewSubPath(r.getCentreX(), r.getY());
 		powerButton.lineTo(r.getCentre());
 
 		PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
 
-		auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colour(0u, 172u, 1u);
+		auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colour(0u, 172u, 1u);//See if the bypass is on or not and change the color accordingly 
 
 		g.setColour(color);
 		g.strokePath(powerButton, pst);
@@ -713,6 +717,7 @@ juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
 
 		analyzerEnabledButton.setLookAndFeel(&lnf);
 
+		//disable all the related sliders 
 		auto safePtr = juce::Component::SafePointer<AudioPlugin_TestAudioProcessorEditor>(this);
 		peakBypassButton.onClick = [safePtr]()
 		{
@@ -726,7 +731,7 @@ juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
 			}
 		};
 
-
+		//disable all the related sliders 
 		lowcutBypassButton.onClick = [safePtr]()
 		{
 			if (auto* comp = safePtr.getComponent())
@@ -738,6 +743,7 @@ juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
 			}
 		};
 
+		//disable all the related sliders 
 		highcutBypassButton.onClick = [safePtr]()
 		{
 			if (auto* comp = safePtr.getComponent())
@@ -749,6 +755,7 @@ juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
 			}
 		};
 
+		//disable all the related sliders 
 		analyzerEnabledButton.onClick = [safePtr]()
 		{
 			if (auto* comp = safePtr.getComponent())

@@ -301,13 +301,11 @@ struct AnalyzerButton : juce::ToggleButton
 
         juce::Random r;
 
-        randomPath.startNewSubPath(insetRect.getX(),
-            insetRect.getY() + insetRect.getHeight() * r.nextFloat());
+        randomPath.startNewSubPath(insetRect.getX(), insetRect.getY() + insetRect.getHeight() * r.nextFloat());
 
         for (auto x = insetRect.getX() + 1; x < insetRect.getRight(); x += 2)
         {
-            randomPath.lineTo(x,
-                insetRect.getY() + insetRect.getHeight() * r.nextFloat());
+            randomPath.lineTo(x,insetRect.getY() + insetRect.getHeight() * r.nextFloat());
         }
     }
 
@@ -341,12 +339,12 @@ private:
 	using Attachment = APVTS::SliderAttachment;
 
 	Attachment peakFreqSliderAttachment,
-		peakGainSliderAttachment,
-		peakQualitySliderAttachment,
-		lowCutFreqSliderAttachment,
-		highCutFreqSliderAttachment,
-		lowCutSlopeSliderAttachment,
-		highCutSlopeSliderAttachment;
+		       peakGainSliderAttachment,
+		       peakQualitySliderAttachment,
+		       lowCutFreqSliderAttachment,
+		       highCutFreqSliderAttachment,
+		       lowCutSlopeSliderAttachment,
+		       highCutSlopeSliderAttachment;
 
 	std::vector<juce::Component*> getComps();
 
@@ -364,6 +362,4 @@ private:
 
 };
 
-//The low cut slider removes low frequencies from the audio.You'll interpret this as the bass disappearing from the sound.
-//the High cut slider removes high frequencies.This will sound like the audio is getting more and more muffled.
-//You'll need to play with the peak slider and gain slider to hear the effects of that filter.
+
